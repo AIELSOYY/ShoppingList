@@ -1,12 +1,36 @@
+import {
+  useFonts,
+  Roboto_100Thin,
+  Roboto_100Thin_Italic,
+  Roboto_300Light,
+  Roboto_300Light_Italic,
+  Roboto_400Regular,
+  Roboto_400Regular_Italic,
+  Roboto_500Medium,
+  Roboto_500Medium_Italic,
+  Roboto_700Bold,
+  Roboto_700Bold_Italic,
+  Roboto_900Black,
+  Roboto_900Black_Italic,
+} from '@expo-google-fonts/roboto';
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, Button, FlatList, TouchableOpacity, Modal, Alert, Pressable } from 'react-native';
+import { StyleSheet, Text, View, TextInput, Button, FlatList, TouchableOpacity, Modal, Alert, Pressable, ImageBackground, Image } from 'react-native';
 import AddProduct from './components/AddProduct';
 import Products from './components/Products';
+import Header from './components/Header';
+import Colors from './constants/Colors';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { NavigationContainer } from '@react-navigation/native';
+
+
 
 export default function App() {
   const [myProducts, setMyProducts]= useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [fontsLoaded, error] = useFonts({
+    Roboto: Roboto_500Medium,
+  })
 
   const submitHandler = (product) => {
     if(product.length>1){
@@ -37,8 +61,12 @@ export default function App() {
       return currentMyProducts.filter(product => product.key != key)
     })
   }
-  
+
+  const Tab = createBottomTabNavigator();
+
   return (
+    <ImageBackground style={styles.bgImage} source={require('./assets/image/img.jpg')}>
+      <Header/>
     <View style={styles.container}>
       <Modal visible={showModal} onRequestClose={()=>setShowModal(false)} animationType='slide' transparent>
         <View style={styles.modalContainer}>
@@ -72,21 +100,44 @@ export default function App() {
         )
       }) */}
       <FlatList  
-        //sachant que l'on part sur une Flatlist vous n'etes pas oblige de preciser 
-        //le key au niveau de l'élément parent
           data={myProducts}
-          //le item sera tout les éléments que vous aurez au niveau de votre tableau
           renderItem={({item}) => (
-            <Products 
-            name={item.name}
-            idString={item.key}
-            deleteProduct={deleteProduct}
-            />
+            <Products name={item.name} idString={item.key} deleteProduct={deleteProduct}/>
           )}
         />
+
     </View>
+    <NavigationContainer>
+      <Tab.Navigator>
+        <Tab.Screen name="Home" component={HomeScreen} options={{tabBarIcon: () => {
+          return (
+            <Image source={{uri:'./assets/image/img.jpg'}}/>
+          )
+        }}}/>
+        <Tab.Screen name="Settings" component={SettingsScreen}/>
+      </Tab.Navigator>
+    </NavigationContainer>
+    
+    </ImageBackground>
+    
 
   );
+}
+
+function HomeScreen(){
+  return(
+    <View>
+      <Text>Home</Text>
+    </View>
+  )
+}
+
+function SettingsScreen(){
+  return(
+    <View>
+      <Text>Settings</Text>
+    </View>
+  )
 }
 
 const styles = StyleSheet.create({
@@ -103,7 +154,7 @@ const styles = StyleSheet.create({
   },
   textInput: {
     height: 40,
-    borderColor: 'grey',
+    borderColor: Colors.gray,
     borderWidth: 1,
     padding: 10,
     margin: 9,
@@ -148,7 +199,8 @@ const styles = StyleSheet.create({
   },
   modalHeaderText: {
     color: 'grey',
-    fontSize: 17
+    fontSize: 17,   
+    fontFamily: 'Roboto'
   },
   modalBody: {
     flex: 1,
@@ -175,4 +227,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     padding: 16
   },
+  bgImage:{
+    flex: 1
+  }
 });
